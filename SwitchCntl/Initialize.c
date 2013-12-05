@@ -225,7 +225,7 @@ void Spi2MasterTx(uint8_t *tx_buff_ptr,uint8_t *rx_buff_ptr,uint8_t tx_count)
 	spi2_tx_data_s.txdata_len = tx_count;
 	spi2_tx_data_s.rxdata_len = 0;
 	spi2_tx_data_s.data_buff_status = SPI1_TX_TRANSMIT_ON;
-	
+	hal_spi_transfe_start();
 	SpiEnableTxInterrupt(SPI2_BASE_PTR);
 	
 }//End of Spi2MasterTx
@@ -254,7 +254,7 @@ void Spi2TxRxIsrHandler(void)
 	//--> Read status register	
 	stat_reg = (SPI_SR_REG(SPI2_BASE_PTR) & (SPI_SR_TFFF_MASK | SPI_SR_RFDF_MASK ));
 
-	//-->If TX FIFO is full.
+	//-->If TX FIFO is empty.
 	if((SPI_SR_REG(SPI2_BASE_PTR)   & SPI_SR_TFFF_MASK) == SPI_TX_READY)
 	{
 		if( SPI1_TX_BUFFER_EMPTY == spi2_tx_data_s.data_len)
@@ -270,13 +270,32 @@ void Spi2TxRxIsrHandler(void)
 		else
 		{
 			//--> Transmit Byte on SPI 
-			SPI_PUSHR_REG(SPI2_BASE_PTR) = *spi2_tx_data_s.data_buff_ptr;
+			while((SPI_SR_REG(SPI2_BASE_PTR) & SPI_SR_TFFF_MASK))
+			{
+				if(spi2_tx_data_s.data_len > 1 )
+				{
+					// as long as bit it set, we have room in our fifo
+					SPI_PUSHR_REG(SPI2_BASE_PTR) = SPI_PUSHR_CONT_MASK |
+							SPI_PUSHR_PCS(1<<0) | *spi2_tx_data_s.data_buff_ptr;
 
-			spi2_tx_data_s.data_buff_ptr++;
-			spi2_tx_data_s.data_len--;
-			
+					spi2_tx_data_s.data_buff_ptr++;
+					spi2_tx_data_s.data_len--;
+				}
+				else
+				{
+					// last byte in our tx buffer
+					// as long as bit it set, we have room in our fifo
+					SPI_PUSHR_REG(SPI2_BASE_PTR) = 
+							SPI_PUSHR_PCS(1<<0) | *spi2_tx_data_s.data_buff_ptr;
+
+					spi2_tx_data_s.data_buff_ptr++;
+					spi2_tx_data_s.data_len--;
+					
+				}
+			}
 			//-->Clear Transmit FIFO Flag.
 			SPI_SR_REG(SPI2_BASE_PTR) |= SPI_SR_TFFF_MASK;
+			SpiEnableRxInterrupt( SPI2_BASE_PTR );
 		}
 	}
 	
@@ -289,7 +308,8 @@ void Spi2TxRxIsrHandler(void)
 		{
 			spi2_tx_data_s.rxdata_buff_ptr[spi2_tx_data_s.rxdata_len++] = spi_rx_data;
 		
-			SpiDisableTxInterrupt(SPI2_BASE_PTR);
+			SpiDisableRxInterrupt(SPI2_BASE_PTR);
+			hal_spi_transfe_stop();
 		}
 		else
 		{
