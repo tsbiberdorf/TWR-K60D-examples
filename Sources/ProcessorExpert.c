@@ -69,15 +69,15 @@ static portTASK_FUNCTION(Task1, pvParameters)
 //	PDB0_Init();
 	hal_spi_init();
 	
-	hal_spi_transfe_start();
-	txBuffer[0] =  hal_spi_transfer_one_byte(0x9F,0);
-	txBuffer[1] =  hal_spi_transfer_one_byte(0x0,0);
-	txBuffer[2] =  hal_spi_transfer_one_byte(0x0,0);
-	txBuffer[3] =  hal_spi_transfer_one_byte(0x0,0);
-	txBuffer[4] =  hal_spi_transfer_one_byte(0x0,1);
-	hal_spi_transfe_stop();
-	printf("%x %x %x %x %x\n",txBuffer[1],txBuffer[2],txBuffer[3],txBuffer[4]);
-	
+//	hal_spi_transfe_start();
+//	txBuffer[0] =  hal_spi_transfer_one_byte(0x9F,0);
+//	txBuffer[1] =  hal_spi_transfer_one_byte(0x0,0);
+//	txBuffer[2] =  hal_spi_transfer_one_byte(0x0,0);
+//	txBuffer[3] =  hal_spi_transfer_one_byte(0x0,0);
+//	txBuffer[4] =  hal_spi_transfer_one_byte(0x0,1);
+//	hal_spi_transfe_stop();
+//	printf("%x %x %x %x %x\n",txBuffer[1],txBuffer[2],txBuffer[3],txBuffer[4]);
+//	
 	
 	// Enable the ADC and PDB interrupts in NVIC
 	set_irq_priority (INT_ADC0-16, 2);
@@ -85,8 +85,8 @@ static portTASK_FUNCTION(Task1, pvParameters)
 	set_irq_priority (INT_PDB0-16, 2);
 	enable_irq(INT_PDB0-16) ;    // ready for this interrupt.
 
-//	set_irq_priority (INT_SPI2-16, 2);
-//	enable_irq(INT_SPI2-16) ;    // ready for this interrupt.
+	set_irq_priority (INT_SPI2-16, 2);
+	enable_irq(INT_SPI2-16) ;    // ready for this interrupt.
 
 	
 //	set_irq_priority (INT_SWI-16, 3);
@@ -102,6 +102,16 @@ static portTASK_FUNCTION(Task1, pvParameters)
 	{
 		//		GreenLED_Neg();
 		NegYellowLED();
+//		hal_spi_transfe_start();
+//		txBuffer[0] =  hal_spi_transfer_one_byte(0x9F,0);
+//		txBuffer[1] =  hal_spi_transfer_one_byte(0x0,0);
+//		txBuffer[2] =  hal_spi_transfer_one_byte(0x0,0);
+//		txBuffer[3] =  hal_spi_transfer_one_byte(0x0,0);
+//		txBuffer[4] =  hal_spi_transfer_one_byte(0x0,1);
+//		hal_spi_transfe_stop();
+//		printf("%x %x %x %x %x\n",txBuffer[1],txBuffer[2],txBuffer[3],txBuffer[4]);
+		
+		
 		if(spiFlag)
 		{
 			spiFlag = 0;

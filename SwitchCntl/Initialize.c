@@ -42,11 +42,13 @@ static void init_fifo(void)
 {
     SPI2_MCR &= ~SPI_MCR_MDIS_MASK;
 
-    SPI2_MCR |= SPI_MCR_DIS_RXF_MASK |
-                SPI_MCR_DIS_TXF_MASK |
-                SPI_MCR_CLR_RXF_MASK |
-                SPI_MCR_CLR_TXF_MASK;
+//    SPI2_MCR |= SPI_MCR_DIS_RXF_MASK |
+//                SPI_MCR_DIS_TXF_MASK |
+//                SPI_MCR_CLR_RXF_MASK |
+//                SPI_MCR_CLR_TXF_MASK;
 
+    SPI2_MCR |= SPI_MCR_CLR_RXF_MASK |
+                SPI_MCR_CLR_TXF_MASK;
 }
 static void init_inactive_cs(void)
 {
