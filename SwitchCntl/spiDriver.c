@@ -609,4 +609,20 @@ void SpiEnableRxInterrupt( SPI_MemMapPtr base )
 	SPI_RSER_REG(base) |= SPI_RSER_RFDF_RE_MASK; 
 
 }//End of SpiEnableRxInterrupt
+
+/*
+*******************************************************************************
+* void SpiDisableRxInterrupt( SPI_MemMapPtr base )
+*******************************************************************************
+* Input         : base : Pointer to SPI0/ SPI1 /SPI2 Register Base 	
+* Output        : void
+* Description   : Disable The SPI module RX interrupt
+*******************************************************************************
+*/
+void SpiDisableRxInterrupt( SPI_MemMapPtr base )
+{
+	SPI_RSER_REG(base) &= (~SPI_RSER_RFDF_RE_MASK); 
+
+}//End of SpiEnableRxInterrupt
+
 /*-------------------------------END OF FILE----------------------------------*/

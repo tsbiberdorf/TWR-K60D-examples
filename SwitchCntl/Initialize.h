@@ -38,5 +38,9 @@ void ClrPTD15();
 void NegPTD15();
 
 void Spi2MasterTx(uint8_t *tx_buff_ptr,uint8_t *rx_buff_ptr,uint8_t tx_count);
+uint8_t hal_spi_transfer_one_byte(uint8_t v, uint8_t end);
+void hal_spi_init(void);
+void hal_spi_transfe_start(void);
+void hal_spi_transfe_stop(void);
 
 #endif /* INITIALIZE_H_ */
