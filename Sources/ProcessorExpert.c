@@ -54,7 +54,7 @@
 static portTASK_FUNCTION(Task1, pvParameters) 
 {
 	(void)pvParameters; /* ignore unused parameter */
-	int spiFlag = 0;
+	int spiFlag = 1;
 	uint8_t txBuffer[5];
 	uint8_t rxBuffer[5];
 	
@@ -114,7 +114,7 @@ static portTASK_FUNCTION(Task1, pvParameters)
 		
 		if(spiFlag)
 		{
-			spiFlag = 0;
+//			spiFlag = 0;
 			txBuffer[0] = 0x9f;
 			Spi2MasterTx(txBuffer,rxBuffer,4);
 		}
@@ -134,7 +134,8 @@ int main(void)
 	/*** End of Processor Expert internal initialization.                    ***/
 
 	/* Write your code here */
-	(void)FRTOS1_xTaskCreate(Task1, (signed portCHAR *)"Task1", configMINIMAL_STACK_SIZE*3, NULL, tskIDLE_PRIORITY, NULL);
+	(void)FRTOS1_xTaskCreate(Task1, (signed portCHAR *)"Task1", configMINIMAL_STACK_SIZE*3, NULL, tskIDLE_PRIORITY-1, NULL);
+	(void)FRTOS1_xTaskCreate(Task1, (signed portCHAR *)"Task1", configMINIMAL_STACK_SIZE*3, NULL, tskIDLE_PRIORITY-2, NULL);
 	heapSize = xPortGetFreeHeapSize();
 	printf("starting my ADC application %d\n",heapSize);
 	FRTOS1_vTaskStartScheduler();

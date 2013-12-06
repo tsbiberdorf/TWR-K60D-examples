@@ -9,7 +9,7 @@
 #include "spiDriver.h"
 
 #define SPI1_TX_BUFFER_EMPTY			(0U)
-
+#define RX_CNTR_MASK	(0x000000F0) // RX counter mask is bits 7:4 of SPIx_SR register
 
 /*
 *******************************************************************************
@@ -290,6 +290,7 @@ void Spi2TxRxIsrHandler(void)
 
 					spi2_tx_data_s.data_buff_ptr++;
 					spi2_tx_data_s.data_len--;
+					break;
 					
 				}
 			}
@@ -299,23 +300,29 @@ void Spi2TxRxIsrHandler(void)
 		}
 	}
 	
-	//-->If RX FIFO is full
-	if((SPI_SR_REG(SPI2_BASE_PTR)  & SPI_SR_RFDF_MASK) == SPI_DATA_RECEIVED)
+	//-->If RX FIFO is not empty
+	if(SPI_SR_REG(SPI2_BASE_PTR) & SPI_SR_RFDF_MASK)
 	{
-		//Read character from receiver
-		spi_rx_data = SPI_POPR_REG(SPI2_BASE_PTR) ; 
-		if(spi2_tx_data_s.rxdata_len < spi2_tx_data_s.txdata_len)
+		if(SPI_SR_REG(SPI2_BASE_PTR) & RX_CNTR_MASK )
 		{
-			spi2_tx_data_s.rxdata_buff_ptr[spi2_tx_data_s.rxdata_len++] = spi_rx_data;
+			//Read character from receiver
+			while((SPI_SR_REG(SPI2_BASE_PTR) & SPI_SR_RFDF_MASK))
+			{
+				// read each byte from the fifo
+				spi_rx_data = SPI_POPR_REG(SPI2_BASE_PTR) ; 
+				if(spi2_tx_data_s.rxdata_len < spi2_tx_data_s.txdata_len)
+				{
+					spi2_tx_data_s.rxdata_buff_ptr[spi2_tx_data_s.rxdata_len++] = spi_rx_data;
+				}
+				else
+				{
+					SpiDisableRxInterrupt(SPI2_BASE_PTR);
+					hal_spi_transfe_stop();
+					break;
+				}
+			}
+		}
 		
-			SpiDisableRxInterrupt(SPI2_BASE_PTR);
-			hal_spi_transfe_stop();
-		}
-		else
-		{
-			while(1)
-				;
-		}
 		//--> Copy data received on SPI1 to application buffer
 		//--> by calling the application function
 

@@ -192,6 +192,7 @@ extern void SpiEnable( SPI_MemMapPtr base );
 extern void SpiEnableTxInterrupt( SPI_MemMapPtr base );
 extern void SpiDisableTxInterrupt( SPI_MemMapPtr base );
 extern void SpiEnableRxInterrupt( SPI_MemMapPtr base );
+extern void SpiDisableRxInterrupt( SPI_MemMapPtr base );
 
 extern uint8_t SpiMasterTxRxByte( SPI_MemMapPtr base, uint8_t tx_byte);
 
